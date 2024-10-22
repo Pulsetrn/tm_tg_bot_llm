@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from main import db_url
+from loadotenv import db_url
 
 
 class DatabaseHelper:

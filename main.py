@@ -1,18 +1,13 @@
 import asyncio
-import os
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import CommandStart, Command
 import logging
 import requests
-import dotenv
 from source.routers import router as handlers_router
+from loadotenv import bot_token
 
-dotenv.load_dotenv()
-bot_token = os.getenv("TG_BOT_KEY")
-db_url = os.getenv("TG_BOT_DB")
-print(bot_token)
 bot = Bot(
     token=bot_token,
     default=DefaultBotProperties(parse_mode=ParseMode.HTML),
@@ -30,12 +25,6 @@ async def create_task(msg: types.Message):
 @dp.message(Command("help"))
 async def handle_help(msg: types.Message):
     pass
-
-
-# TODO: поприветствовать + отослать к комманде help
-@dp.message(CommandStart())
-async def handle_start(msg: types.Message):
-    await msg.answer(f"Hello {msg.from_user.full_name}!")
 
 
 @dp.message(Command("quote"))

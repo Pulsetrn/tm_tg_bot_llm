@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Mapped, relationship
+from sqlalchemy.orm import Mapped, relationship, mapped_column
 from typing import TYPE_CHECKING
 from source.config.db.models.base import Base
 
@@ -17,4 +17,4 @@ class User(Base):
     decks: Mapped[list["Deck"]] = relationship(back_populates="user")
     profile: Mapped["Profile"] = relationship(back_populates="user")
     fullname: Mapped[str]
-    range_of_interests: Mapped[str | None]
+    tg_id: Mapped[int] = mapped_column(unique=True)
