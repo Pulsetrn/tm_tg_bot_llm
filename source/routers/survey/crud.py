@@ -9,7 +9,12 @@ async def record_survey(
     session: AsyncSession,
 ) -> bool:
     try:
-        new_profile = Profile(tg_id=msg.from_user.id, email=data["email"], bio=data["bio"])
+        new_profile = Profile(
+            tg_id=msg.from_user.id,
+            email=data["email"],
+            bio=data["bio"],
+            range_of_interests=data["range_of_interests"],
+        )
         session.add(new_profile)
         await session.commit()
     except Exception:

@@ -48,7 +48,25 @@ async def save_and_send_survey_results(results: dict, msg: types.Message):
 async def handle_bio(msg: types.Message, state: FSMContext):
     await state.update_data(bio=msg.text)
     msg.answer(
-        "Good!\nDo you like to see the results of the survey?",
+        "Good!\nDo you want to share some of your interests. follow this form:\ninterest1,interest2,interest3 and so on, the separator would be ',' without spaces!\n\nIf you don't want to share anything - just write: 'No'",
+    )
+    await state.set_state(Survey.range_of_interests)
+
+
+@router.message(StateFilter(Survey.bio), F.text != "No")
+async def handle_negative_bio(msg: types.Message, state: FSMContext):
+    await state.update_data(bio=None)
+    msg.answer(
+        "Good!\nDo you want to share some of your interests. follow this form:\ninterest1,interest2,interest3 and so on, the separator would be ',' without spaces!\n\nIf you don't want to share anything - just write: 'No'",
+    )
+    await state.set_state(Survey.range_of_interests)
+
+
+@router.message(StateFilter(Survey.range_of_interests), F.text != "No")
+async def handle_range_of_interests(msg: types.Message, state: FSMContext):
+    await state.update_data(range_of_interests=msg.text)
+    await msg.answer(
+        "Well.\n\nThen, do you want to see the results of the survey?",
         reply_markup=ReplyKeyboardMarkup(
             keyboard=[[KeyboardButton(text="Yes")], [KeyboardButton(text="No")]],
         ),
@@ -56,11 +74,11 @@ async def handle_bio(msg: types.Message, state: FSMContext):
     await state.set_state(Survey.finish)
 
 
-@router.message(StateFilter(Survey.bio), F.text != "No")
-async def handle_negative_bio(msg: types.Message, state: FSMContext):
-    await state.update_data(bio=None)
-    msg.answer(
-        "Good!\nDo you like to see the results of the survey?",
+@router.message(StateFilter(Survey.range_of_interests), F.text != "No")
+async def handle_negative_range_of_interests(msg: types.Message, state: FSMContext):
+    await state.update_data(range_of_interests=None)
+    await msg.answer(
+        "Well.\n\nThen, do you want to see the results of the survey?",
         reply_markup=ReplyKeyboardMarkup(
             keyboard=[[KeyboardButton(text="Yes")], [KeyboardButton(text="No")]],
         ),
