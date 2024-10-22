@@ -30,7 +30,7 @@ target_metadata = Base.metadata
 # if not db_url:
 #     print(db_url)
 #     raise ValueError("There's no db url")
-from source.main import db_url
+from main import db_url
 config.set_main_option("sqlalchemy.url", db_url)  # type: ignore
 
 # other values from the config, defined by the needs of env.py,
