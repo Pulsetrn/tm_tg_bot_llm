@@ -16,5 +16,4 @@ myenv/
 *.cache
 *.bak
 
-.DS_Store
-Thumbs.db
+todo.
