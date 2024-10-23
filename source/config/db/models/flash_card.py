@@ -10,11 +10,11 @@ if TYPE_CHECKING:
     from source.config.db.models.deck import Deck
 
 
-class Level(Enum):
-    PENDING = "pending"
-    BAD = "bad"
-    MEDIUM = "medium"
-    GOOD = "good"
+# class Level(Enum):
+#     PENDING = "pending"
+#     BAD = "bad"
+#     MEDIUM = "medium"
+#     GOOD = "good"
 
 
 class Flash_card(Base):

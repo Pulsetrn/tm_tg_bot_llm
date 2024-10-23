@@ -10,4 +10,4 @@ class Profile_survey(StatesGroup):
 
 class Change_profile(StatesGroup):
     answer = State()
-    changing = State()
+    deleting = State()

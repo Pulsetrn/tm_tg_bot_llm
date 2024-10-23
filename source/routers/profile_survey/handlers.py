@@ -10,6 +10,7 @@ from aiogram.utils import markdown
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from source.routers.profile_survey.crud import (
+    delete_user_profile,
     get_user_profile_data,
     is_user_exist,
     record_survey,
@@ -33,6 +34,15 @@ async def handle_cancel_survey(msg: types.Message, state: FSMContext):
     )
 
 
+@router.message(Command("cancel"), StateFilter(Change_profile))
+async def handle_cancel_changing(msg: types.Message, state: FSMContext):
+    await state.clear()
+    await msg.answer(
+        "Okay.\nDo you want something else?",
+        reply_markup=types.ReplyKeyboardRemove(),
+    )
+
+
 @router.message(Command("show_profile_data"), StateFilter(default_state))
 async def handle_check_profile_data(
     msg: types.Message, state: FSMContext, session: AsyncSession
@@ -47,7 +57,7 @@ async def handle_check_profile_data(
                 "Range of interests:", markdown.hbold(profile_data.range_of_interests)
             ),
             "",
-            "Do you want to change something?",
+            "Do you want to delete your profile?",
             sep="\n",
         )
         await msg.answer(
@@ -64,24 +74,53 @@ async def handle_check_profile_data(
         await state.set_state(Change_profile.answer)
     else:
         await msg.answer(
-            "Have you already taken the survey to create a profile? If not, then you cannot look at data that you have not yet written. Please first complete the survey using the command: '/profile_survey'"
+            "Have you already taken the survey to create a profile?\nIf not, then you cannot look at data that you have not yet written. Please first complete the survey using the command: '/profile_survey'"
         )
+
+
+@router.message(StateFilter(Change_profile.deleting), F.text == "Yes")
+async def handle_yes_delete_answer(
+    msg: types.Message, state: FSMContext, session: AsyncSession
+):
+    if await delete_user_profile(msg, session):
+        await msg.answer(
+            "Alright.\n\nI've deleted your account\n\nDo you want something else?",
+            reply_markup=types.ReplyKeyboardRemove(),
+        )
+        await state.clear()
+    else:
+        await msg.answer(
+            text="An error occurred while deleting profile. Please, try again.\n\n In case of failure, contact @Georpl_tme",
+            reply_markup=types.ReplyKeyboardRemove(),
+        )
+        await state.clear()
+
+
+@router.message(StateFilter(Change_profile.deleting), F.text == "No")
+async def handle_no_delete_answer(msg: types.Message, state: FSMContext):
+    await state.clear()
+    await msg.answer("Okay.\n\nDo you want something else?")
+
+
+@router.message(StateFilter(Change_profile.deleting), F.text != "No", F.text != "Yes")
+async def handle_not_no_or_yes_delete_answer(msg: types.Message):
+    await msg.answer("Please answer: Yes or No.\n\nYou can also use the keyboard.")
 
 
 @router.message(StateFilter(Change_profile.answer), F.text == "Yes")
 async def handle_yes_answer(msg: types.Message, state: FSMContext):
     await msg.answer(
-        "Good!\n\nWhat do you want to change?",
+        "Okay, are you sure?",
         reply_markup=ReplyKeyboardMarkup(
             keyboard=[
-                [KeyboardButton(text="Email")],
-                [KeyboardButton(text="Bio")],
-                [KeyboardButton(text="Range of interests")],
-                [KeyboardButton(text="Delete the profile")],
+                [
+                    KeyboardButton(text="Yes"),
+                    KeyboardButton(text="No"),
+                ]
             ]
         ),
     )
-    await state.set_state(Change_profile.changing)
+    await state.set_state(Change_profile.deleting)
 
 
 @router.message(StateFilter(Change_profile.answer), F.text == "No")
@@ -95,7 +134,7 @@ async def handle_not_no_or_yes_answer(msg: types.Message):
     await msg.answer("Please answer: Yes or No.\n\nYou can also use the keyboard.")
 
 
-@router.message(Command("srofile_survey"), StateFilter(default_state))
+@router.message(Command("profile_survey"), StateFilter(default_state))
 async def start_survey(msg: types.Message, state: FSMContext, session: AsyncSession):
     if await is_user_exist(session, msg):
         await msg.answer(

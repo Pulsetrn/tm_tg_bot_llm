@@ -7,6 +7,18 @@ from sqlalchemy.orm import joinedload
 from source.config.db.models.user import User
 
 
+async def delete_user_profile(msg: types.Message, session: AsyncSession) -> bool:
+    try:
+        stmt = select(Profile).join(Profile.user).where(User.tg_id == msg.from_user.id)  # type: ignore
+        profile = await session.scalar(stmt)
+        print(profile)
+        await session.delete(profile)
+    except Exception:
+        return False
+    await session.commit()
+    return True
+
+
 async def get_user_profile_data(
     msg: types.Message,
     session: AsyncSession,
