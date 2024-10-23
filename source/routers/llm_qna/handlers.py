@@ -23,3 +23,10 @@ async def handle_user_message(msg: types.Message):
         await msg.answer(
             "Do you want something?\n\nIf you don't know what you want, you can use '/help' command to see the list of the existing commands"
         )
+
+
+@router.message()
+async def handle_other_message(msg: types.Message):
+    await msg.answer(
+        "I don't understand.\n\nIf you want something and don't know - use '/help' to see the list of the commands."
+    )

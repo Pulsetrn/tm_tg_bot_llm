@@ -236,7 +236,7 @@ async def handle_finish(msg: types.Message, state: FSMContext, session: AsyncSes
     await msg.answer(text=text)
     if await record_survey(msg, data, session):
         await msg.answer(
-            text="your results have been successfully recorded",
+            text="Your results have been successfully recorded",
             reply_markup=types.ReplyKeyboardRemove(),
         )
     else:
@@ -256,7 +256,7 @@ async def handle_negative_finish(
     await state.clear()
     if await record_survey(msg, data, session):
         await msg.answer(
-            text="your results have been successfully recorded",
+            text="Your results have been successfully recorded",
             reply_markup=types.ReplyKeyboardRemove(),
         )
     else:
