@@ -1,5 +1,5 @@
 from aiogram import Router
-from .survey import router as survey_router
+from .profile_survey import router as survey_router
 from .handle_first_time import router as first_time_router
 
 router = Router(name=__name__)

@@ -2,23 +2,26 @@ import asyncio
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram import Bot, Dispatcher, types
-from aiogram.filters import CommandStart, Command
+from aiogram.filters import Command
 import logging
 import requests
+from source.middlewares.db_middleware import DBMiddleware
 from source.routers import router as handlers_router
-from loadotenv import bot_token
+from loadotenv import bot_token, db_url
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+
 
 bot = Bot(
-    token=bot_token,
+    token=bot_token,  # type: ignore
     default=DefaultBotProperties(parse_mode=ParseMode.HTML),
-)  # type: ignore
+)
 dp = Dispatcher()
 dp.include_router(handlers_router)
 
 
 @dp.message(Command("create_task"))
 async def create_task(msg: types.Message):
-    await msg.answer(msg.from_user.id, "Good!\nWrite the name of your task")
+    await msg.answer(msg.from_user.id, "Good!\nWrite the name of your task")  # type: ignore
 
 
 # TODO: аналогично start
@@ -40,6 +43,20 @@ async def get_quote(msg: types.Message):
 
 async def main():
     logging.basicConfig(level=logging.DEBUG)
+    engine = create_async_engine(
+        url=db_url,  # type: ignore
+        echo=True,
+        pool_size=5,
+        max_overflow=10,
+    )
+    session_factory = async_sessionmaker(
+        bind=engine,
+        autoflush=False,
+        autocommit=False,
+        expire_on_commit=False,
+    )
+    dp.update.middleware(DBMiddleware(session_factory=session_factory))
+    await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 
