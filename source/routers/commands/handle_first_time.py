@@ -2,7 +2,7 @@ from aiogram import Router, types
 from aiogram.filters import CommandStart
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from source.routers.root_crud import remember_user
+from source.routers.commands.root_crud import remember_user
 
 router = Router(name=__name__)
 
