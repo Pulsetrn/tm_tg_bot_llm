@@ -28,7 +28,6 @@ async def add_deck_to_user(
         new_deck = Deck(
             name=data["name"],
             tag=data["tag"],
-            cards=[],
         )
         session.add(new_deck)
         await session.commit()

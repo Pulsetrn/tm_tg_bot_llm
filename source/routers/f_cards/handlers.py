@@ -67,9 +67,18 @@ async def handle_choosing_name(msg: types.Message, state: FSMContext):
 
 
 @router.message(StateFilter(Deck_creating.tag))
-async def handle_choosing_tag(msg: types.Message, state: FSMContext):
+async def handle_choosing_tag(
+    msg: types.Message, state: FSMContext, session: AsyncSession
+):
     await state.update_data(name=msg.text)
-    await msg.answer("")
+    data = await state.update_data(tag=None)
+    await state.clear()
+    if await add_deck_to_user(msg, data, session):
+        await msg.answer("Your results have been successfully recorded")
+    else:
+        await msg.answer(
+            "An error occurred while creating new deck. Please, try again.\n\n In case of failure, contact @Georpl_tme"
+        )
 
 
 @router.message(StateFilter(Deck_creating.tag), F.text == "No")
@@ -84,5 +93,5 @@ async def handle_negative_choosing_tag(
         await msg.answer("Your results have been successfully recorded")
     else:
         await msg.answer(
-            "An error occurred while creating new deck. Please, try again.\n\n In case of failure, contact @Georpl_tme"
+            "An error occurred while creating new deck. Please, try again.\n\nIn case of failure, contact @Georpl_tme"
         )
