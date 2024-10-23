@@ -25,10 +25,12 @@ async def add_deck_to_user(
     session: AsyncSession,
 ) -> bool:
     try:
+        user = await session.scalar(select(User).where(User.tg_id == msg.from_user.id))  # type: ignore
         new_deck = Deck(
             name=data["name"],
             tag=data["tag"],
             recent_interaction=None,
+            user_id=user.id,  # type: ignore
         )
         session.add(new_deck)
         await session.commit()
