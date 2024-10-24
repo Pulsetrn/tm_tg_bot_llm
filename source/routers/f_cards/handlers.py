@@ -60,7 +60,7 @@ async def show_deck_cards(
     if cards := await validate_name_uniqueness_or_existing(msg, deck_name, session, "exist"):  # type: ignore
         await state.set_state(Deck_options.deck_entered)
         cards_text = (
-            "\n".join([f"{num}) {card.question}" for num, card in enumerate(cards, 1)])
+            "\n".join([f"{num}) {card.question}" for num, card in enumerate(cards, 1)])  # type: ignore
             if cards != "empty"
             else False
         )
@@ -86,7 +86,7 @@ async def handle_deck_name_choosing(
         await state.update_data(deck_name=deck_name)
         await state.set_state(Deck_options.deck_entered)
         cards_text = (
-            "\n".join([f"{num}) {card.question}" for num, card in enumerate(cards, 1)])
+            "\n".join([f"{num}) {card.question}" for num, card in enumerate(cards, 1)])  # type: ignore
             if cards != "empty"
             else False
         )
