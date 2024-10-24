@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 class Deck(Base, UserRelationMixin):
     _user_back_populates = "decks"
     cards: Mapped[list["Flash_card"]] = relationship(back_populates="deck")
-    name: Mapped[str]
+    name: Mapped[str] = mapped_column(unique=True)
     tag: Mapped[str | None]
     recent_interaction: Mapped[datetime.date | None]
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=func.now())

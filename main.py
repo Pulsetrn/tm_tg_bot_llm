@@ -45,7 +45,7 @@ async def main():
     logging.basicConfig(level=logging.DEBUG)
     engine = create_async_engine(
         url=db_url,  # type: ignore
-        echo=True,
+        echo=False,
         pool_size=5,
         max_overflow=10,
     )
